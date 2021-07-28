@@ -14,15 +14,6 @@ class AdminController extends Controller
      */
     public function index()
     {
-        // $id = Auth::user()->id;
-        // $admins = DB::table('table_assignusers')
-        // ->leftJoin('users','users.id','=','table_assignusers.user_id')
-        // ->select('table_assignusers.*','users.*')
-        // ->where([
-        //     ['users.is_superadmin','=', '0'],
-        //     ['table_assignusers.assign_admin','=',$id],
-        // ])
-        // ->get();
         $products = Product::orderBy('name', 'ASC')->get();
         // dd($users);
         return view('admin.index', compact('products'));

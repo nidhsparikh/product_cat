@@ -140,7 +140,12 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $product = Product::findOrFail($id);
+        if (Auth::user()->isAdmin()) {
+            $products = Product::findOrFail($id);
+        } elseif (Auth::user()->isUser()) {
+            $user_id = Auth::user()->id;
+            $product = Product::where('user_id', $user_id)->findOrFail($id);
+        }
         $categories = Category::all();
         foreach ($product->category as $procat) {
             $selectedTags[] = $procat->id;

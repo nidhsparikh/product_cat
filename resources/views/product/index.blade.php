@@ -11,7 +11,11 @@
                     </div>
                     <div class="float-right">
                         <a class="btn btn-primary" href="{{ route('product.create') }}">Add Products</a>
+                        @if(auth()->user()->role == 'admin')
                         <a class="btn btn-secondary" href="{{ route('admin') }}">Back</a>
+                        @elseif(auth()->user()->role == 'user')
+                        <a class="btn btn-secondary" href="{{ route('user') }}">Back</a>
+                        @endif
                     </div>
                 </div>
             </div>

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Category;
 use App\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -15,7 +17,20 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::get();
+        if (Auth::user()->isAdmin()) {
+            $products = Product::get();
+        } elseif (Auth::user()->isUser()) {
+            $id = Auth::user()->id;
+            $products = DB::table('product')
+                ->leftJoin('users', 'users.id', '=', 'product.user_id')
+                ->select('product.*')
+                ->where([
+                    ['product.user_id', '=', $id],
+                ])
+                ->get();
+            // $products = Product::get();
+        }
+
         return view('product.index', compact('products'));
     }
 
@@ -50,15 +65,29 @@ class ProductController extends Controller
         ]);
 
         $products = new Product();
-        $products->name = $request->name;
-        $products->description = $request->description;
-        $products->price = $request->price;
-        // $products->image = $request->image;
-        if ($image = $request->file('image')) {
-            $destinationPath = 'image/';
-            $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $profileImage);
-            $products['image'] = "$profileImage";
+        if (Auth::user()->isAdmin()) {
+            $products->name = $request->name;
+            $products->description = $request->description;
+            $products->price = $request->price;
+            // $products->image = $request->image;
+            if ($image = $request->file('image')) {
+                $destinationPath = 'image/';
+                $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
+                $image->move($destinationPath, $profileImage);
+                $products['image'] = "$profileImage";
+            }
+        } elseif (Auth::user()->isUser()) {
+            $products->user_id = Auth::user()->id;
+            $products->name = $request->name;
+            $products->description = $request->description;
+            $products->price = $request->price;
+            // $products->image = $request->image;
+            if ($image = $request->file('image')) {
+                $destinationPath = 'image/';
+                $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
+                $image->move($destinationPath, $profileImage);
+                $products['image'] = "$profileImage";
+            }
         }
         $products->save();
         $products->category()->attach($request->categories_id);
@@ -85,7 +114,12 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        $product = Product::findOrFail($id);
+        if (Auth::user()->isAdmin()) {
+            $products = Product::findOrFail($id);
+        } elseif (Auth::user()->isUser()) {
+            $user_id = Auth::user()->id;
+            $product = Product::where('user_id', $user_id)->findOrFail($id);
+        }
         $categories = Category::all();
         foreach ($product->category as $procat) {
             $selectedTags[] = $procat->id;
@@ -122,22 +156,37 @@ class ProductController extends Controller
                 'categories_id' => ['required', 'array', 'min:1'],
                 'categories_id.*' => ['required', 'integer', 'exists:category,id'],
             ]);
-            $product->name = $request->name;
-            $product->description = $request->description;
-            $product->price = $request->price;
-            // $product->image = $request->image;
-            if ($image = $request->file('image')) {
-                $destinationPath = 'image/';
-                $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
-                $image->move($destinationPath, $profileImage);
-                $product['image'] = "$profileImage";
-            } else {
-                unset($product['image']);
+            if (Auth::user()->isAdmin()) {
+                $product->name = $request->name;
+                $product->description = $request->description;
+                $product->price = $request->price;
+                // $product->image = $request->image;
+                if ($image = $request->file('image')) {
+                    $destinationPath = 'image/';
+                    $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
+                    $image->move($destinationPath, $profileImage);
+                    $product['image'] = "$profileImage";
+                } else {
+                    unset($product['image']);
+                }
+            } elseif (Auth::user()->isUser()) {
+                $product->name = $request->name;
+                $product->description = $request->description;
+                $product->price = $request->price;
+                // $product->image = $request->image;
+                if ($image = $request->file('image')) {
+                    $destinationPath = 'image/';
+                    $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
+                    $image->move($destinationPath, $profileImage);
+                    $product['image'] = "$profileImage";
+                } else {
+                    unset($product['image']);
+                }
             }
             $product->save();
             Product::find($id)->category()->sync($request->categories_id);
             // $product->category()->attach($request->categories_id);
-            
+
             return redirect()->route('product.index');
         } else {
             return back()->with('error', 'Data not found.');

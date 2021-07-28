@@ -21,7 +21,7 @@
                     <th>Product Name</th>
                     <th>Price</th>
                     <th>Image</th>
-                    <th width="280px">Action</th>
+                    <!-- <th width="280px">Action</th> -->
                 </tr>
                 @foreach ($products as $product)
                 <tr>
@@ -29,7 +29,7 @@
                     <td>{{ $product->name }}</td>
                     <th>{{ $product->price }}</th>
                     <td><img src="/image/{{ $product->image }}" width="100px"></td>
-                    <td>
+                    <!-- <td>
                         <form action="{{ route('category.destroy',$product->id) }}" method="POST">
                             
                             <a class="btn btn-warning" href="{{ route('category.edit',$product->id) }}">Edit</a>
@@ -38,7 +38,7 @@
 
                             <button type="submit" class="btn btn-danger">Delete</button> 
                         </form>
-                    </td> 
+                    </td>  -->
                 </tr>
                 @endforeach
             </table>

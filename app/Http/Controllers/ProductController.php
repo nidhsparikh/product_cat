@@ -115,7 +115,7 @@ class ProductController extends Controller
     public function edit($id)
     {
         if (Auth::user()->isAdmin()) {
-            $products = Product::findOrFail($id);
+            $product = Product::findOrFail($id);
         } elseif (Auth::user()->isUser()) {
             $user_id = Auth::user()->id;
             $product = Product::where('user_id', $user_id)->findOrFail($id);
@@ -141,7 +141,7 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         if (Auth::user()->isAdmin()) {
-            $products = Product::findOrFail($id);
+            $product = Product::findOrFail($id);
         } elseif (Auth::user()->isUser()) {
             $user_id = Auth::user()->id;
             $product = Product::where('user_id', $user_id)->findOrFail($id);

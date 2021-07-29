@@ -15,7 +15,8 @@ class AdminController extends Controller
     public function index()
     {
         $products = Product::orderBy('name', 'ASC')->get();
-        // dd($users);
+        $session_email = session()->get('user_id');
+        // dd($session_email);
         return view('admin.index', compact('products'));
     }
 

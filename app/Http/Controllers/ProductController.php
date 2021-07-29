@@ -19,16 +19,14 @@ class ProductController extends Controller
     {
         if (Auth::user()->isAdmin()) {
             $products = Product::get();
-        } elseif (Auth::user()->isUser()) {
+        }elseif (Auth::user()->isUser()) {
             $id = Auth::user()->id;
             $products = DB::table('product')
                 ->leftJoin('users', 'users.id', '=', 'product.user_id')
                 ->select('product.*')
                 ->where([
-                    ['product.user_id', '=', $id],
-                ])
+                    ['product.user_id', '=', $id],])
                 ->get();
-            // $products = Product::get();
         }
 
         return view('product.index', compact('products'));

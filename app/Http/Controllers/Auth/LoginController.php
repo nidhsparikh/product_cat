@@ -41,11 +41,15 @@ class LoginController extends Controller
     }
     protected function authenticated(Request $request, $user)
     {
-        if(Auth::check()){
-            if(Auth::user()->isAdmin()){
+        if (Auth::check()) {
+            if (Auth::user()->isAdmin()) {
+                $userdata = array(
+                    'user_id' => auth()->user()->id,
+                    'logged_in' => TRUE,
+                );
+                $request->session()->put($userdata);
                 return redirect(route('admin'));
-            }
-            else if(Auth::user()->isUser()){
+            } else if (Auth::user()->isUser()) {
                 return redirect(route('user'));
             }
         }
